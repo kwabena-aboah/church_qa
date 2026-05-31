@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Dashboard – {{ CHURCH_NAME }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: #f1f5f0; }
+  .dash-sidebar { width: 220px; min-height: 100vh; background: var(--primary); position: fixed; top: 0; left: 0; z-index: 100; padding-top: 4.5rem; }
+  .dash-sidebar .nav-link { color: rgba(255,255,255,.7) !important; font-size: .875rem; font-weight: 500; padding: .65rem 1.5rem; border-radius: 0; border-left: 3px solid transparent; transition: all .15s; display: flex; align-items: center; gap: .6rem; }
+  .dash-sidebar .nav-link:hover, .dash-sidebar .nav-link.active { color: #fff !important; border-left-color: var(--accent); background: rgba(255,255,255,.07); }
+  .dash-sidebar .nav-section { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.3); padding: 1.2rem 1.5rem .4rem; }
+  .dash-main { margin-left: 220px; padding: 1.5rem 2rem 3rem; }
+  .dash-header { margin-bottom: 1.5rem; }
+  .dash-header h1 { font-family: var(--font-d); font-size: 1.6rem; color: var(--primary); margin: 0; }
+  .dash-header .sub { font-size: .83rem; color: var(--muted); }
+
+  /* Metric Cards */
+  .metric-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 1.25rem 1.4rem; box-shadow: var(--shadow); position: relative; overflow: hidden; transition: transform .2s; }
+  .metric-card:hover { transform: translateY(-2px); }
+  .metric-card .icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+  .metric-card .value { font-family: var(--font-d); font-size: 2rem; font-weight: 700; color: var(--primary); line-height: 1; }
+  .metric-card .label { font-size: .78rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; margin-top: .15rem; }
+  .metric-card .trend { font-size: .75rem; margin-top: .5rem; }
+  .metric-card .trend.up { color: #16a34a; }
+  .metric-card .trend.warn { color: #d97706; }
+  .metric-card .trend.err { color: #dc2626; }
+
+  /* Alert bar */
+  .alert-bar { background: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: .8rem 1.2rem; font-size: .85rem; color: #92400e; display: flex; align-items: center; gap: .6rem; }
+
+  /* Charts */
+  .chart-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); padding: 1.25rem; }
+  .chart-card h6 { font-family: var(--font-d); color: var(--primary); font-size: .95rem; margin-bottom: 1rem; }
+  canvas { max-height: 220px; }
+
+  /* Tables */
+  .table-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+  .table-card-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .table-card-header h6 { font-family: var(--font-d); color: var(--primary); margin: 0; font-size: .95rem; }
+  .table { margin: 0; font-size: .84rem; }
+  .table th { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; border-bottom-width: 1px; padding: .75rem 1rem; }
+  .table td { padding: .75rem 1rem; vertical-align: middle; border-color: #f3f4f6; }
+  .status-pill { border-radius: 20px; padding: .2rem .65rem; font-size: .7rem; font-weight: 700; display: inline-block; }
+  .pill-pending { background: #fef3c7; color: #92400e; }
+  .pill-sent { background: #dcfce7; color: #166534; }
+  .pill-failed { background: #fee2e2; color: #991b1b; }
+  .pill-answered { background: #dbeafe; color: #1d4ed8; }
+  .pill-flagged { background: #fae8ff; color: #7e22ce; }
+  .bar-bg { background: #f1f5f0; border-radius: 99px; height: 6px; overflow: hidden; width: 80px; display: inline-block; margin-left: .5rem; vertical-align: middle; }
+  .bar-fill { background: var(--primary-light); height: 100%; border-radius: 99px; }
+
+  /* Delivery meter */
+  .delivery-ring { position: relative; width: 80px; height: 80px; }
+  .delivery-ring svg { transform: rotate(-90deg); }
+  .delivery-ring .pct-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+  @media (max-width: 768px) {
+    .dash-sidebar { display: none; }
+    .dash-main { margin-left: 0; padding: 1rem; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Sidebar -->
+<aside class="dash-sidebar">
+  <div class="nav-section">Overview</div>
+  <a href="{% url 'dashboard:dashboard_home' %}" class="nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  <a href="{% url 'dashboard:questions_list' %}" class="nav-link"><i class="bi bi-chat-dots"></i> All Questions</a>
+  <div class="nav-section">Data</div>
+  <a href="{% url 'admin:sermons_sermon_changelist' %}" class="nav-link"><i class="bi bi-collection-play"></i> Sermons</a>
+  <a href="{% url 'admin:sermons_speaker_changelist' %}" class="nav-link"><i class="bi bi-person-badge"></i> Speakers</a>
+  <a href="{% url 'admin:sermons_question_changelist' %}" class="nav-link"><i class="bi bi-question-circle"></i> Questions</a>
+  <div class="nav-section">System</div>
+  <a href="/admin/" class="nav-link"><i class="bi bi-shield-check"></i> Django Admin</a>
+  <a href="{% url 'logout' %}" class="nav-link"><i class="bi bi-box-arrow-left"></i> Log Out</a>
+</aside>
+
+<div class="dash-main">
+  <div class="dash-header d-flex justify-content-between align-items-start">
+    <div>
+      <h1>📊 Dashboard</h1>
+      <div class="sub">{{ CHURCH_NAME }} · Sermon Q&A Metrics</div>
+    </div>
+    <div class="d-flex gap-2">
+      <button onclick="refreshMetrics()" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+      <a href="{% url 'dashboard:questions_list' %}?status=failed" class="btn btn-sm btn-danger {% if failed_questions == 0 %}d-none{% endif %}" id="failed-btn">
+        <i class="bi bi-exclamation-triangle me-1"></i><span id="failed-count">{{ failed_questions }}</span> Failed
+      </a>
+    </div>
+  </div>
+
+  {% if pending_questions > 0 %}
+  <div class="alert-bar mb-4">
+    <i class="bi bi-clock-history"></i>
+    <span><strong>{{ pending_questions }} question{{ pending_questions|pluralize }}</strong> are pending delivery. They will be retried automatically.</span>
+    <a href="{% url 'dashboard:questions_list' %}?status=pending" class="ms-auto text-decoration-none" style="color:#92400e;font-weight:600;font-size:.82rem">View →</a>
+  </div>
+  {% endif %}
+
+  <!-- Metric Cards Row 1 -->
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="icon" style="background:#dbeafe"><i class="bi bi-collection-play" style="color:#1d4ed8"></i></div>
+          <div>
+            <div class="value">{{ total_sermons }}</div>
+            <div class="label">Total Sermons</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="icon" style="background:#dcfce7"><i class="bi bi-chat-dots" style="color:#166534"></i></div>
+          <div>
+            <div class="value">{{ total_questions }}</div>
+            <div class="label">Total Questions</div>
+          </div>
+        </div>
+        <div class="trend up"><i class="bi bi-arrow-up me-1"></i>{{ questions_week }} this week</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="icon" style="background:#fce7f3"><i class="bi bi-person-badge" style="color:#9d174d"></i></div>
+          <div>
+            <div class="value">{{ total_speakers }}</div>
+            <div class="label">Speakers</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="icon" style="background:#fef9c3"><i class="bi bi-eye" style="color:#854d0e"></i></div>
+          <div>
+            <div class="value">{{ total_views }}</div>
+            <div class="label">Sermon Views</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metric Cards Row 2 -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="label mb-1">Today</div>
+        <div class="value" id="today-count">{{ questions_today }}</div>
+        <div class="trend">questions submitted</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="label mb-1">WhatsApp Delivery</div>
+        <div class="value" style="color:{% if delivery_rate > 80 %}#16a34a{% elif delivery_rate > 50 %}#d97706{% else %}#dc2626{% endif %}">{{ delivery_rate }}%</div>
+        <div class="trend">{{ sent_questions }} sent · {{ failed_questions }} failed</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="label mb-1">Avg Questions / Sermon</div>
+        <div class="value">{{ avg_q_per_sermon }}</div>
+        <div class="trend">engagement rate</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="metric-card">
+        <div class="label mb-1">This Month</div>
+        <div class="value">{{ questions_month }}</div>
+        <div class="trend">questions submitted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row g-3 mb-4">
+    <div class="col-lg-8">
+      <div class="chart-card">
+        <h6><i class="bi bi-graph-up me-2"></i>Questions Over Last 14 Days</h6>
+        <canvas id="lineChart"></canvas>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="chart-card">
+        <h6><i class="bi bi-pie-chart me-2"></i>Question Status</h6>
+        <canvas id="donutChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables Row -->
+  <div class="row g-3 mb-4">
+    <!-- Top Sermons -->
+    <div class="col-lg-6">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h6><i class="bi bi-trophy me-2" style="color:var(--accent)"></i>Top Sermons by Questions</h6>
+        </div>
+        <table class="table table-hover">
+          <thead><tr><th>Sermon</th><th>Speaker</th><th>Questions</th></tr></thead>
+          <tbody>
+            {% for s in top_sermons %}
+            <tr>
+              <td>
+                <a href="/sermon/{{ s.id }}/" class="text-decoration-none fw-500" style="color:var(--primary)">{{ s.title|truncatechars:40 }}</a>
+                <div style="font-size:.72rem;color:var(--muted)">{{ s.sermon_date|date:"M j, Y" }}</div>
+              </td>
+              <td style="font-size:.82rem">{{ s.speaker.name }}</td>
+              <td>
+                <span class="fw-700" style="color:var(--primary)">{{ s.q_count }}</span>
+                <span class="bar-bg"><span class="bar-fill" style="width:{% widthratio s.q_count top_sermons.0.q_count 100 %}%"></span></span>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted py-4">No sermons yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Speaker Stats -->
+    <div class="col-lg-6">
+      <div class="table-card">
+        <div class="table-card-header">
+          <h6><i class="bi bi-people me-2" style="color:var(--primary-light)"></i>Speaker Engagement</h6>
+        </div>
+        <table class="table table-hover">
+          <thead><tr><th>Speaker</th><th>Sermons</th><th>Questions</th></tr></thead>
+          <tbody>
+            {% for sp in speaker_stats %}
+            <tr>
+              <td class="fw-500">{{ sp.name }}</td>
+              <td style="font-size:.85rem">{{ sp.sermon_count }}</td>
+              <td>
+                <span class="fw-700" style="color:var(--primary)">{{ sp.question_count }}</span>
+                {% if speaker_stats.0.question_count > 0 %}
+                <span class="bar-bg"><span class="bar-fill" style="width:{% widthratio sp.question_count speaker_stats.0.question_count 100 %}%"></span></span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-center text-muted py-4">No speakers yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Questions -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h6><i class="bi bi-clock-history me-2"></i>Recent Questions</h6>
+      <a href="{% url 'dashboard:questions_list' %}" class="btn btn-sm btn-outline-secondary">View All</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead><tr><th>Question</th><th>Sermon</th><th>Speaker</th><th>Status</th><th>Time</th></tr></thead>
+        <tbody>
+          {% for q in recent_questions %}
+          <tr>
+            <td style="max-width:280px">
+              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ q.question_text|truncatechars:70 }}</div>
+            </td>
+            <td style="font-size:.8rem">{{ q.sermon.title|truncatechars:35 }}</td>
+            <td style="font-size:.8rem">{{ q.sermon.speaker.name }}</td>
+            <td>
+              <span class="status-pill pill-{{ q.status }}">{{ q.get_status_display }}</span>
+              {% if q.status == 'failed' %}
+              <button onclick="retryQ('{{ q.id }}')" class="btn btn-xs btn-outline-danger ms-1" style="font-size:.65rem;padding:.1rem .4rem">Retry</button>
+              {% endif %}
+            </td>
+            <td style="font-size:.78rem;color:var(--muted);white-space:nowrap">{{ q.submitted_at|timesince }} ago</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No questions yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Line chart
+const days = {{ chart_days_json|safe }};
+const vals = {{ chart_values_json|safe }};
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels: days,
+    datasets: [{
+      label: 'Questions',
+      data: vals,
+      borderColor: '#2d6a4f',
+      backgroundColor: 'rgba(45,106,79,.08)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#d4a843',
+      pointRadius: 4,
+    }]
+  },
+  options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1}},x:{grid:{display:false}}} }
+});
+
+// Donut chart
+const statuses = {{ status_data_json|safe }};
+const COLORS = { pending:'#fbbf24', sent:'#22c55e', failed:'#ef4444', answered:'#3b82f6', flagged:'#a855f7' };
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: statuses.map(s => s.status),
+    datasets: [{ data: statuses.map(s => s.count), backgroundColor: statuses.map(s => COLORS[s.status]||'#ccc'), borderWidth: 2 }]
+  },
+  options: { responsive:true, plugins:{ legend:{position:'bottom',labels:{font:{size:11},padding:10}} }, cutout:'65%' }
+});
+
+// Live refresh
+async function refreshMetrics() {
+  const r = await fetch("{% url 'dashboard:api_metrics' %}");
+  const d = await r.json();
+  document.getElementById('today-count').textContent = d.today;
+  const fb = document.getElementById('failed-btn');
+  const fc = document.getElementById('failed-count');
+  if (d.failed > 0) { fb.classList.remove('d-none'); fc.textContent = d.failed; }
+  else fb.classList.add('d-none');
+}
+setInterval(refreshMetrics, 30000); // refresh every 30s
+
+async function retryQ(id) {
+  await fetch(`/dashboard/questions/${id}/retry/`, { method:'POST', headers:{'X-CSRFToken': window.CSRF} });
+  toast('Retrying question…');
+  setTimeout(() => location.reload(), 2000);
+}
+</script>
+{% endblock %}

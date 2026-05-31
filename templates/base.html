@@ -1,0 +1,107 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ CHURCH_NAME }} – Sermon Q&A{% endblock %}</title>
+  <meta name="description" content="Ask anonymous questions about sermons at {{ CHURCH_NAME }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary:#1a3a2e;--primary-light:#2d6a4f;--accent:#d4a843;--accent-light:#f4d58d;
+      --bg:#faf8f3;--card-bg:#fff;--text:#1c1c1c;--muted:#6b7280;--border:#e5e0d5;
+      --font-d:'Playfair Display',Georgia,serif;--font-b:'DM Sans',system-ui,sans-serif;
+      --radius:12px;--shadow:0 2px 20px rgba(26,58,46,.08);
+    }
+    body{font-family:var(--font-b);background:var(--bg);color:var(--text);}
+    h1,h2,h3,.df{font-family:var(--font-d);}
+    .navbar-church{background:var(--primary);padding:1rem 0;border-bottom:3px solid var(--accent);}
+    .navbar-church .navbar-brand{font-family:var(--font-d);color:#fff!important;font-size:1.4rem;font-weight:700;}
+    .navbar-church .tagline{color:var(--accent-light);font-size:.72rem;font-weight:300;letter-spacing:.05em;}
+    .navbar-church .nav-link{color:rgba(255,255,255,.82)!important;font-weight:500;font-size:.88rem;transition:color .2s;}
+    .navbar-church .nav-link:hover{color:var(--accent)!important;}
+    .card{border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+    .btn-primary{background:var(--primary);border-color:var(--primary);font-weight:600;border-radius:8px;transition:all .2s;}
+    .btn-primary:hover{background:var(--primary-light);border-color:var(--primary-light);transform:translateY(-1px);}
+    .btn-accent{background:var(--accent);border-color:var(--accent);color:var(--primary);font-weight:700;border-radius:8px;}
+    .btn-accent:hover{background:#c49535;border-color:#c49535;color:var(--primary);}
+    .badge-video{background:#dbeafe;color:#1d4ed8;font-size:.68rem;font-weight:700;letter-spacing:.04em;}
+    .badge-audio{background:#fce7f3;color:#9d174d;font-size:.68rem;font-weight:700;}
+    .badge-text{background:#dcfce7;color:#166534;font-size:.68rem;font-weight:700;}
+    footer{background:var(--primary);color:rgba(255,255,255,.7);padding:2.5rem 0;margin-top:4rem;font-size:.84rem;}
+    footer a{color:var(--accent-light);text-decoration:none;}
+    #toast-container{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;}
+    .toast-c{background:var(--primary);color:#fff;border-radius:10px;padding:1rem 1.5rem;box-shadow:0 8px 30px rgba(0,0,0,.2);min-width:280px;margin-top:.5rem;animation:slideUp .3s ease;}
+    .toast-err{background:#7f1d1d;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-church navbar-expand-lg">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      ✝ {{ CHURCH_NAME }}
+      <div class="tagline">{{ CHURCH_TAGLINE }}</div>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" style="border-color:rgba(255,255,255,.3)">
+      <i class="bi bi-list" style="color:#fff;font-size:1.5rem"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-center gap-2">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi bi-collection-play me-1"></i>Sermons</a></li>
+        {% if user.is_authenticated %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:dashboard_home' %}"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}"><i class="bi bi-shield-check me-1"></i>Admin</a></li>
+        <li class="nav-item">
+          <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="nav-link">Logout</button>
+          </form>
+        </li>
+        {% else %}
+        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<footer>
+  <div class="container text-center">
+    <p class="mb-2 fw-500">{{ CHURCH_NAME }} — Sermon Q&A</p>
+    <p class="mb-3" style="opacity:.55;font-size:.75rem">Questions are submitted anonymously. Your identity is never revealed.</p>
+    <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;font-size:.78rem;opacity:.6;display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;">
+      <a href="{% url 'privacy_policy' %}" style="color:var(--accent-light);text-decoration:none;">
+        <i class="bi bi-shield-check me-1"></i>Privacy Policy
+      </a>
+      <span style="opacity:.4">·</span>
+      <a href="{% url 'terms_of_service' %}" style="color:var(--accent-light);text-decoration:none;">
+        <i class="bi bi-file-earmark-text me-1"></i>Terms of Service
+      </a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{% static 'js/vue.global.prod.js' %}"></script>
+<script>
+  window.CSRF = '{{ csrf_token }}';
+  function toast(msg, err=false){
+    const c=document.getElementById('toast-container');
+    const t=document.createElement('div');
+    t.className='toast-c'+(err?' toast-err':'');
+    t.innerHTML=`<i class="bi bi-${err?'exclamation-circle':'check-circle-fill'} me-2"></i>${msg}`;
+    c.appendChild(t);setTimeout(()=>t.remove(),4500);
+  }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

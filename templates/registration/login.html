@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Login – {{ CHURCH_NAME }}{% endblock %}
+{% block content %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:80vh;background:linear-gradient(135deg,var(--primary) 0%,#0f2a1d 100%);padding:2rem">
+  <div style="width:100%;max-width:380px">
+    <div class="text-center mb-4">
+      <div style="font-size:3rem;color:var(--accent)">✝</div>
+      <h2 style="font-family:var(--font-d);color:#fff;font-size:1.8rem;margin:.5rem 0 .25rem">{{ CHURCH_NAME }}</h2>
+      <p style="color:rgba(255,255,255,.5);font-size:.85rem">Admin Dashboard Login</p>
+    </div>
+    <div class="bg-white rounded-4 p-4" style="border-top:4px solid var(--accent)">
+      {% if form.errors %}<div class="alert alert-danger py-2 mb-3" style="font-size:.85rem"><i class="bi bi-exclamation-circle me-2"></i>Invalid credentials. Please try again.</div>{% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label fw-600" style="font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Username</label>
+          <input type="text" name="username" class="form-control" autofocus autocomplete="username" style="border-color:var(--border)">
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-600" style="font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Password</label>
+          <input type="password" name="password" class="form-control" autocomplete="current-password" style="border-color:var(--border)">
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn btn-primary w-100 py-2 fw-600">
+          <i class="bi bi-shield-lock me-2"></i>Sign In
+        </button>
+      </form>
+    </div>
+    <p class="text-center mt-3" style="font-size:.75rem;color:rgba(255,255,255,.4)">Authorized personnel only</p>
+  </div>
+</div>
+{% endblock %}

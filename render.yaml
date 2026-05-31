@@ -1,0 +1,72 @@
+# render.com deployment configuration
+services:
+  # Main Django web service
+  - type: web
+    name: church-qa-web
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: gunicorn church_qa.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: "church-qa-web.onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: church-qa-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: church-qa-redis
+          type: redis
+          property: connectionString
+      - key: WHATSAPP_API_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: CHURCH_NAME
+        value: "My Church"
+      - key: CHURCH_TAGLINE
+        value: "Ask questions about our sermons"
+
+  # Celery worker for async WhatsApp sending
+  - type: worker
+    name: church-qa-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A church_qa worker --loglevel=info --concurrency=2
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: church-qa-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: church-qa-redis
+          type: redis
+          property: connectionString
+      - key: SECRET_KEY
+        fromService:
+          name: church-qa-web
+          type: web
+          envVarKey: SECRET_KEY
+      - key: WHATSAPP_API_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+
+  # Redis (Celery broker)
+  - type: redis
+    name: church-qa-redis
+    plan: free
+
+databases:
+  - name: church-qa-db
+    plan: free

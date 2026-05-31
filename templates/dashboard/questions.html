@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}All Questions – Dashboard{% endblock %}
+{% block extra_css %}
+<style>
+  body { background: #f1f5f0; }
+  .dash-sidebar { width: 220px; min-height: 100vh; background: var(--primary); position: fixed; top: 0; left: 0; z-index: 100; padding-top: 4.5rem; }
+  .dash-sidebar .nav-link { color: rgba(255,255,255,.7) !important; font-size: .875rem; font-weight: 500; padding: .65rem 1.5rem; border-left: 3px solid transparent; transition: all .15s; display: flex; align-items: center; gap: .6rem; }
+  .dash-sidebar .nav-link:hover, .dash-sidebar .nav-link.active { color: #fff !important; border-left-color: var(--accent); background: rgba(255,255,255,.07); }
+  .dash-sidebar .nav-section { font-size: .65rem; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.3); padding: 1.2rem 1.5rem .4rem; }
+  .dash-main { margin-left: 220px; padding: 1.5rem 2rem 3rem; }
+  .table-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden; }
+  .table th { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 600; }
+  .table td { vertical-align: middle; font-size: .84rem; border-color: #f3f4f6; }
+  .status-pill { border-radius: 20px; padding: .2rem .65rem; font-size: .7rem; font-weight: 700; }
+  .pill-pending { background:#fef3c7;color:#92400e; }
+  .pill-sent { background:#dcfce7;color:#166534; }
+  .pill-failed { background:#fee2e2;color:#991b1b; }
+  .pill-answered { background:#dbeafe;color:#1d4ed8; }
+  .pill-flagged { background:#fae8ff;color:#7e22ce; }
+  @media (max-width:768px){.dash-sidebar{display:none;}.dash-main{margin-left:0;padding:1rem;}}
+</style>
+{% endblock %}
+
+{% block content %}
+<aside class="dash-sidebar">
+  <div class="nav-section">Overview</div>
+  <a href="{% url 'dashboard:dashboard_home' %}" class="nav-link active"><i class="bi bi-speedometer2"></i> Dashboard</a>
+  <a href="{% url 'dashboard:questions_list' %}" class="nav-link"><i class="bi bi-chat-dots"></i> All Questions</a>
+  <div class="nav-section">Data</div>
+  <a href="{% url 'admin:sermons_sermon_changelist' %}" class="nav-link"><i class="bi bi-collection-play"></i> Sermons</a>
+  <a href="{% url 'admin:sermons_speaker_changelist' %}" class="nav-link"><i class="bi bi-person-badge"></i> Speakers</a>
+  <a href="{% url 'admin:sermons_question_changelist' %}" class="nav-link"><i class="bi bi-question-circle"></i> Questions</a>
+  <div class="nav-section">System</div>
+  <a href="/admin/" class="nav-link"><i class="bi bi-shield-check"></i> Django Admin</a>
+  <a href="{% url 'logout' %}" class="nav-link"><i class="bi bi-box-arrow-left"></i> Log Out</a>
+</aside>
+
+<div class="dash-main">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 style="font-family:var(--font-d);font-size:1.6rem;color:var(--primary);margin:0">All Questions</h1>
+    <a href="{% url 'dashboard:dashboard_home' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-3 border p-3 mb-3" style="border-color:var(--border)!important">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All Statuses</option>
+          <option value="pending" {% if active_status == 'pending' %}selected{% endif %}>⏳ Pending</option>
+          <option value="sent" {% if active_status == 'sent' %}selected{% endif %}>✅ Sent</option>
+          <option value="failed" {% if active_status == 'failed' %}selected{% endif %}>❌ Failed</option>
+          <option value="answered" {% if active_status == 'answered' %}selected{% endif %}>💬 Answered</option>
+          <option value="flagged" {% if active_status == 'flagged' %}selected{% endif %}>🚩 Flagged</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Sermon</label>
+        <select name="sermon" class="form-select form-select-sm">
+          <option value="">All Sermons</option>
+          {% for s in sermons %}
+          <option value="{{ s.id }}" {% if active_sermon == s.id|stringformat:"s" %}selected{% endif %}>{{ s.title|truncatechars:50 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label text-muted" style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em">Speaker</label>
+        <select name="speaker" class="form-select form-select-sm">
+          <option value="">All Speakers</option>
+          {% for sp in speakers %}
+          <option value="{{ sp.id }}" {% if active_speaker == sp.id|stringformat:"s" %}selected{% endif %}>{{ sp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-sm btn-primary w-100">Filter</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light"><tr>
+          <th style="width:35%">Question</th>
+          <th>Sermon</th>
+          <th>Speaker</th>
+          <th>Category</th>
+          <th>Status</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr></thead>
+        <tbody>
+          {% for q in questions %}
+          <tr>
+            <td>
+              <div style="max-width:320px">{{ q.question_text|truncatechars:120 }}</div>
+              {% if q.admin_notes %}<div class="mt-1 text-muted" style="font-size:.72rem"><i class="bi bi-sticky me-1"></i>{{ q.admin_notes|truncatechars:60 }}</div>{% endif %}
+            </td>
+            <td>
+              <a href="/sermon/{{ q.sermon.id }}/" class="text-decoration-none" style="color:var(--primary);font-size:.82rem">{{ q.sermon.title|truncatechars:35 }}</a>
+            </td>
+            <td style="font-size:.82rem">{{ q.sermon.speaker.name }}</td>
+            <td style="font-size:.8rem">{% if q.category %}{{ q.category.icon }} {{ q.category.name }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td>
+              <span class="status-pill pill-{{ q.status }}">{{ q.get_status_display }}</span>
+              {% if q.retry_count %}<div class="text-muted" style="font-size:.68rem">{{ q.retry_count }} retry{{ q.retry_count|pluralize }}</div>{% endif %}
+            </td>
+            <td style="font-size:.78rem;white-space:nowrap;color:var(--muted)">
+              {{ q.submitted_at|date:"M j, Y" }}<br>{{ q.submitted_at|time:"H:i" }}
+            </td>
+            <td>
+              {% if q.status == 'failed' %}
+              <button onclick="retryQ('{{ q.id }}')" class="btn btn-xs btn-outline-danger" style="font-size:.72rem;padding:.2rem .5rem">Retry</button>
+              {% endif %}
+              <a href="/admin/sermons/question/{{ q.id }}/change/" class="btn btn-xs btn-outline-secondary ms-1" style="font-size:.72rem;padding:.2rem .5rem"><i class="bi bi-pencil"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="text-center text-muted py-5">No questions match the current filters.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function retryQ(id) {
+  const r = await fetch(`/dashboard/questions/${id}/retry/`, { method:'POST', headers:{'X-CSRFToken':window.CSRF} });
+  const d = await r.json();
+  toast(d.success ? 'Retry sent!' : 'Retry failed.', !d.success);
+  setTimeout(() => location.reload(), 1500);
+}
+</script>
+{% endblock %}

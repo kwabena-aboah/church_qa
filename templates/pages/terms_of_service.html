@@ -1,0 +1,313 @@
+{% extends "base.html" %}
+{% block title %}Terms of Service – {{ CHURCH_NAME }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .legal-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f2a1d 100%);
+    padding: 3rem 0 2rem;
+  }
+  .legal-hero h1 { color: #fff; font-size: 2rem; }
+  .legal-hero .meta { color: rgba(255,255,255,.55); font-size: .83rem; }
+
+  .legal-body {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 0 4rem;
+  }
+  .legal-body h2 {
+    font-family: var(--font-d);
+    font-size: 1.15rem;
+    color: var(--primary);
+    margin-top: 2.2rem;
+    margin-bottom: .6rem;
+    padding-bottom: .4rem;
+    border-bottom: 2px solid var(--accent-light);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .legal-body p, .legal-body li {
+    font-size: .93rem;
+    line-height: 1.8;
+    color: #374151;
+  }
+  .legal-body ul, .legal-body ol { padding-left: 1.4rem; }
+  .legal-body li { margin-bottom: .35rem; }
+
+  .notice-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: .88rem;
+    color: #78350f;
+    margin: 1.5rem 0;
+  }
+  .notice-box strong { color: #92400e; }
+
+  .rule-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: .75rem;
+    display: flex;
+    gap: .85rem;
+    align-items: flex-start;
+    box-shadow: var(--shadow);
+  }
+  .rule-card .rule-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .rule-card .rule-text { font-size: .88rem; color: #374151; line-height: 1.6; }
+  .rule-card .rule-text strong { color: var(--primary); }
+
+  .toc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .toc h6 { font-family: var(--font-d); color: var(--primary); margin-bottom: .75rem; font-size: .9rem; }
+  .toc ol { margin: 0; padding-left: 1.2rem; }
+  .toc li { font-size: .85rem; margin-bottom: .3rem; }
+  .toc a { color: var(--primary-light); text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  .contact-card {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  .contact-card h5 { font-family: var(--font-d); color: var(--accent-light); margin-bottom: .5rem; }
+  .contact-card p { color: rgba(255,255,255,.75); font-size: .88rem; margin: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-hero">
+  <div class="container">
+    <div class="mb-2">
+      <a href="/" class="text-decoration-none" style="color:rgba(255,255,255,.5);font-size:.83rem">
+        <i class="bi bi-arrow-left me-1"></i>Back to Sermons
+      </a>
+    </div>
+    <h1 class="df mb-1"><i class="bi bi-file-earmark-text me-2" style="color:var(--accent)"></i>Terms of Service</h1>
+    <div class="meta">
+      Effective: {{ effective_date }} &nbsp;·&nbsp; Last updated: {{ last_updated }}
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="legal-body">
+
+    <div class="notice-box">
+      <strong>Please read these terms before using the platform.</strong> By submitting a question
+      through this platform, you agree to these Terms of Service. If you do not agree, please do
+      not use this service.
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+      <h6>📋 Contents</h6>
+      <ol>
+        <li><a href="#about">About the Service</a></li>
+        <li><a href="#eligibility">Who May Use This Service</a></li>
+        <li><a href="#acceptable-use">Acceptable Use</a></li>
+        <li><a href="#prohibited">Prohibited Content</a></li>
+        <li><a href="#anonymity">Anonymity &amp; Responsibility</a></li>
+        <li><a href="#moderation">Moderation &amp; Removal</a></li>
+        <li><a href="#intellectual-property">Intellectual Property</a></li>
+        <li><a href="#disclaimers">Disclaimers</a></li>
+        <li><a href="#limitation">Limitation of Liability</a></li>
+        <li><a href="#termination">Termination of Access</a></li>
+        <li><a href="#governing-law">Governing Law</a></li>
+        <li><a href="#changes">Changes to These Terms</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ol>
+    </div>
+
+    <!-- 1 -->
+    <h2 id="about"><i class="bi bi-info-circle"></i> 1. About the Service</h2>
+    <p>
+      {{ CHURCH_NAME }} ("the Church", "we", "us") operates this Sermon Q&amp;A platform (the
+      "Service") to enable congregation members and visitors to submit anonymous questions about
+      sermons posted to our WhatsApp community. Questions are forwarded anonymously to the
+      relevant sermon speaker via WhatsApp Business.
+    </p>
+    <p>
+      The Service is provided as a ministry tool for the benefit of our community. It is free to
+      use and requires no registration or account.
+    </p>
+
+    <!-- 2 -->
+    <h2 id="eligibility"><i class="bi bi-people"></i> 2. Who May Use This Service</h2>
+    <p>
+      This Service is open to all members of the {{ CHURCH_NAME }} congregation, visitors, and
+      anyone who has been given access to the platform. By using the Service, you confirm that:
+    </p>
+    <ul>
+      <li>You will use it only for its intended purpose — asking sincere questions about sermons.</li>
+      <li>You will comply with these Terms of Service.</li>
+      <li>You understand that abuse of the platform may result in your access being restricted.</li>
+    </ul>
+
+    <!-- 3 -->
+    <h2 id="acceptable-use"><i class="bi bi-check2-circle"></i> 3. Acceptable Use</h2>
+    <p>You may use this Service to:</p>
+    <div class="rule-card">
+      <span class="rule-icon">❓</span>
+      <div class="rule-text"><strong>Ask genuine questions</strong> about the content, meaning, or application of a sermon — including theological, practical, or personal application questions.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">📖</span>
+      <div class="rule-text"><strong>Request scripture references</strong> or ask for clarification on Bible passages mentioned in a sermon.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">🙏</span>
+      <div class="rule-text"><strong>Submit prayer-related questions</strong> that arise from the sermon topic, including questions about how to pray for specific situations.</div>
+    </div>
+    <div class="rule-card">
+      <span class="rule-icon">💡</span>
+      <div class="rule-text"><strong>Seek practical guidance</strong> on how to apply sermon teachings in daily life, family, work, or ministry contexts.</div>
+    </div>
+
+    <!-- 4 -->
+    <h2 id="prohibited"><i class="bi bi-slash-circle"></i> 4. Prohibited Content</h2>
+    <p>You must NOT submit questions or content that:</p>
+    <ul>
+      <li>Is abusive, threatening, harassing, or intended to harm the speaker or anyone else</li>
+      <li>Contains profanity, vulgarity, or sexually explicit material</li>
+      <li>Promotes hate, discrimination, or violence against any person or group</li>
+      <li>Is defamatory, false, or misleading</li>
+      <li>Is intended to harass, intimidate, or embarrass the speaker personally</li>
+      <li>Contains spam, advertising, or promotional content unrelated to the sermon</li>
+      <li>Attempts to identify, expose, or deanonymise other users</li>
+      <li>Violates any applicable law or regulation</li>
+      <li>Is sent repeatedly with intent to flood or disrupt the service (spam)</li>
+    </ul>
+    <div class="notice-box">
+      <strong>⚠️ This is a church ministry platform.</strong> Questions should be respectful,
+      constructive, and in keeping with the spirit of Christian community. Content that
+      contradicts these values will be removed and may result in restricted access.
+    </div>
+
+    <!-- 5 -->
+    <h2 id="anonymity"><i class="bi bi-incognito"></i> 5. Anonymity &amp; Responsibility</h2>
+    <p>
+      While the platform is designed to protect your anonymity from speakers and other users,
+      <strong>anonymity does not remove your responsibility</strong> for the content you submit.
+    </p>
+    <ul>
+      <li>You remain morally and spiritually responsible for the questions you submit.</li>
+      <li>Your IP address is logged for rate-limiting and abuse prevention purposes.</li>
+      <li>In cases of serious abuse (e.g. threats, harassment), we reserve the right to use
+          available technical information to address the situation, including involving relevant
+          authorities if required by law.</li>
+      <li>Anonymity is a privilege extended in good faith. Misuse will result in access restrictions.</li>
+    </ul>
+
+    <!-- 6 -->
+    <h2 id="moderation"><i class="bi bi-shield-exclamation"></i> 6. Moderation &amp; Removal</h2>
+    <p>
+      Church administrators review questions and delivery status through the admin dashboard.
+      We reserve the right to:
+    </p>
+    <ul>
+      <li>Flag or remove any question that violates these Terms.</li>
+      <li>Decline to forward a question to a speaker if it is deemed inappropriate.</li>
+      <li>Restrict or block access from an IP address that is being used abusively.</li>
+    </ul>
+    <p>
+      Questions are generally forwarded automatically. Moderation is reactive rather than
+      pre-emptive — questions are delivered unless specifically flagged and removed by an
+      administrator.
+    </p>
+
+    <!-- 7 -->
+    <h2 id="intellectual-property"><i class="bi bi-c-circle"></i> 7. Intellectual Property</h2>
+    <p>
+      Sermon content (videos, audio recordings, notes) posted through this platform remains the
+      intellectual property of {{ CHURCH_NAME }} and the respective speakers. You may not
+      reproduce, distribute, or commercially exploit sermon content without express written
+      permission from the Church.
+    </p>
+    <p>
+      By submitting a question, you grant {{ CHURCH_NAME }} a non-exclusive, royalty-free licence
+      to use, display, and respond to that question in the context of church ministry, including
+      in public sermon responses, teaching series, or community communications.
+    </p>
+
+    <!-- 8 -->
+    <h2 id="disclaimers"><i class="bi bi-exclamation-triangle"></i> 8. Disclaimers</h2>
+    <p>
+      The Service is provided "as is" without warranties of any kind. We do not guarantee that:
+    </p>
+    <ul>
+      <li>Questions will always be delivered successfully (WhatsApp delivery depends on third-party infrastructure).</li>
+      <li>Speakers will respond to every question submitted.</li>
+      <li>The platform will be available at all times without interruption.</li>
+    </ul>
+    <p>
+      Spiritual content and responses from speakers represent their personal theological views
+      and should be considered alongside your own prayerful study of Scripture.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="limitation"><i class="bi bi-shield-x"></i> 9. Limitation of Liability</h2>
+    <p>
+      To the fullest extent permitted by applicable law, {{ CHURCH_NAME }} shall not be liable
+      for any indirect, incidental, special, or consequential damages arising from your use of
+      or inability to use the Service, including failure to deliver a question, loss of data,
+      or any harm arising from content submitted by users.
+    </p>
+
+    <!-- 10 -->
+    <h2 id="termination"><i class="bi bi-power"></i> 10. Termination of Access</h2>
+    <p>
+      We reserve the right to restrict or terminate access to the Service for any user or IP
+      address that violates these Terms, without prior notice. Given the anonymous nature of
+      the platform, restriction is typically implemented at the IP address level.
+    </p>
+
+    <!-- 11 -->
+    <h2 id="governing-law"><i class="bi bi-globe-americas"></i> 11. Governing Law</h2>
+    <p>
+      These Terms of Service are governed by the laws of the Republic of Ghana. Any disputes
+      arising from use of this Service shall be subject to the jurisdiction of the courts of
+      Ghana, without regard to conflict of law principles.
+    </p>
+
+    <!-- 12 -->
+    <h2 id="changes"><i class="bi bi-pencil-square"></i> 12. Changes to These Terms</h2>
+    <p>
+      We may update these Terms of Service at any time. Changes take effect immediately upon
+      posting to this page, with the "Last updated" date revised accordingly. Your continued
+      use of the Service after changes are posted constitutes acceptance of the revised Terms.
+      We will make reasonable efforts to notify regular users of material changes.
+    </p>
+
+    <!-- 13 -->
+    <h2 id="contact"><i class="bi bi-envelope"></i> 13. Contact</h2>
+    <p>
+      Questions about these Terms of Service should be directed to {{ CHURCH_NAME }} through
+      your church's official communication channels or raised directly with a church administrator.
+    </p>
+
+    <div class="contact-card">
+      <h5>Need Clarification?</h5>
+      <p>Speak to a {{ CHURCH_NAME }} administrator or elder if you have questions about these terms or wish to report a concern about content submitted through this platform.</p>
+    </div>
+
+    <p class="mt-4 text-muted" style="font-size:.8rem">
+      Also see: <a href="{% url 'privacy_policy' %}">Privacy Policy</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

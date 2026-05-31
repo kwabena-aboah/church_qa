@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+{% block title %}Privacy Policy – {{ CHURCH_NAME }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .legal-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #0f2a1d 100%);
+    padding: 3rem 0 2rem;
+  }
+  .legal-hero h1 { color: #fff; font-size: 2rem; }
+  .legal-hero .meta { color: rgba(255,255,255,.55); font-size: .83rem; }
+
+  .legal-body {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2.5rem 0 4rem;
+  }
+  .legal-body h2 {
+    font-family: var(--font-d);
+    font-size: 1.15rem;
+    color: var(--primary);
+    margin-top: 2.2rem;
+    margin-bottom: .6rem;
+    padding-bottom: .4rem;
+    border-bottom: 2px solid var(--accent-light);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .legal-body p, .legal-body li {
+    font-size: .93rem;
+    line-height: 1.8;
+    color: #374151;
+  }
+  .legal-body ul { padding-left: 1.4rem; }
+  .legal-body li { margin-bottom: .35rem; }
+
+  .highlight-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #22c55e;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: .88rem;
+    color: #166534;
+    margin: 1.5rem 0;
+    display: flex;
+    gap: .75rem;
+    align-items: flex-start;
+  }
+  .highlight-box i { font-size: 1.2rem; flex-shrink: 0; margin-top: .1rem; }
+
+  .info-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 4px solid #3b82f6;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: .88rem;
+    color: #1e40af;
+    margin: 1.2rem 0;
+  }
+
+  .toc {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .toc h6 { font-family: var(--font-d); color: var(--primary); margin-bottom: .75rem; font-size: .9rem; }
+  .toc ol { margin: 0; padding-left: 1.2rem; }
+  .toc li { font-size: .85rem; margin-bottom: .3rem; }
+  .toc a { color: var(--primary-light); text-decoration: none; font-weight: 500; }
+  .toc a:hover { text-decoration: underline; }
+
+  .contact-card {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  .contact-card h5 { font-family: var(--font-d); color: var(--accent-light); margin-bottom: .5rem; }
+  .contact-card p { color: rgba(255,255,255,.75); font-size: .88rem; margin: 0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="legal-hero">
+  <div class="container">
+    <div class="mb-2">
+      <a href="/" class="text-decoration-none" style="color:rgba(255,255,255,.5);font-size:.83rem">
+        <i class="bi bi-arrow-left me-1"></i>Back to Sermons
+      </a>
+    </div>
+    <h1 class="df mb-1"><i class="bi bi-shield-check me-2" style="color:var(--accent)"></i>Privacy Policy</h1>
+    <div class="meta">
+      Effective: {{ effective_date }} &nbsp;·&nbsp; Last updated: {{ last_updated }}
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="legal-body">
+
+    <div class="highlight-box">
+      <i class="bi bi-shield-fill-check"></i>
+      <div>
+        <strong>Your anonymity is our commitment.</strong> This platform was designed so you can ask
+        questions about sermons without revealing your name, phone number, or any personal identity.
+        We built privacy in from the ground up.
+      </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+      <h6>📋 Contents</h6>
+      <ol>
+        <li><a href="#what-we-collect">Information We Collect</a></li>
+        <li><a href="#anonymity">How Anonymity Works</a></li>
+        <li><a href="#how-we-use">How We Use Information</a></li>
+        <li><a href="#whatsapp">WhatsApp Delivery</a></li>
+        <li><a href="#data-retention">Data Retention</a></li>
+        <li><a href="#cookies">Cookies &amp; Local Storage</a></li>
+        <li><a href="#third-parties">Third-Party Services</a></li>
+        <li><a href="#your-rights">Your Rights</a></li>
+        <li><a href="#children">Children's Privacy</a></li>
+        <li><a href="#changes">Changes to This Policy</a></li>
+        <li><a href="#contact">Contact Us</a></li>
+      </ol>
+    </div>
+
+    <p>
+      {{ CHURCH_NAME }} ("we", "us", or "our") operates this Sermon Q&amp;A platform. This Privacy
+      Policy explains how we handle information when you use our service to submit questions about
+      sermons. We are committed to protecting your privacy and operating transparently.
+    </p>
+
+    <!-- 1 -->
+    <h2 id="what-we-collect"><i class="bi bi-database"></i> 1. Information We Collect</h2>
+    <p>We collect the minimum information necessary to operate the service:</p>
+    <ul>
+      <li><strong>Question text</strong> — the content of the question you submit.</li>
+      <li><strong>Selected question category</strong> — optional label you choose (e.g. "Clarification", "Prayer Request").</li>
+      <li><strong>IP address</strong> — recorded solely to enforce rate limits (max 5 questions per hour per IP) and prevent spam. It is never displayed publicly or shared with speakers.</li>
+      <li><strong>Submission timestamp</strong> — the date and time your question was submitted.</li>
+    </ul>
+    <div class="info-box">
+      <i class="bi bi-info-circle me-2"></i>
+      <strong>We do not collect</strong> your name, phone number, email address, WhatsApp ID, social media profile, or any other personal identifier. No account or login is required.
+    </div>
+
+    <!-- 2 -->
+    <h2 id="anonymity"><i class="bi bi-incognito"></i> 2. How Anonymity Works</h2>
+    <p>
+      When you submit a question, it is forwarded to the sermon speaker's WhatsApp as an anonymous
+      message. The message the speaker receives contains:
+    </p>
+    <ul>
+      <li>The sermon title and date</li>
+      <li>Your question text</li>
+      <li>A note that it was submitted anonymously via the platform</li>
+    </ul>
+    <p>
+      <strong>The speaker cannot see your name, phone number, IP address, or any identifying
+      information.</strong> The message is sent from our church's WhatsApp Business account, not
+      from you personally. Your identity is fully protected at the technical level.
+    </p>
+
+    <!-- 3 -->
+    <h2 id="how-we-use"><i class="bi bi-gear"></i> 3. How We Use Information</h2>
+    <p>We use the information collected only for the following purposes:</p>
+    <ul>
+      <li><strong>Delivering your question</strong> — forwarding it anonymously to the relevant sermon speaker via WhatsApp.</li>
+      <li><strong>Rate limiting</strong> — using your IP address to prevent spam submissions (5 questions per hour).</li>
+      <li><strong>Platform analytics</strong> — aggregated, non-identifiable statistics (e.g. total questions per sermon, delivery rates) shown only to church administrators to help improve the service.</li>
+      <li><strong>Troubleshooting</strong> — diagnosing delivery failures and retrying failed WhatsApp sends.</li>
+    </ul>
+    <p>We do not use your information for marketing, profiling, or any purpose unrelated to operating this service.</p>
+
+    <!-- 4 -->
+    <h2 id="whatsapp"><i class="bi bi-whatsapp"></i> 4. WhatsApp Delivery</h2>
+    <p>
+      Questions are delivered using the <strong>Meta WhatsApp Business Cloud API</strong>. When a
+      question is sent, it passes through Meta's servers as a business-initiated message. Meta's
+      own privacy policy governs how they process message data in transit. The speaker's WhatsApp
+      number is stored in our system solely for the purpose of routing your anonymous question to
+      the correct person.
+    </p>
+    <p>
+      Meta's privacy policy is available at
+      <a href="https://www.whatsapp.com/legal/privacy-policy" target="_blank" rel="noopener">
+        whatsapp.com/legal/privacy-policy
+      </a>.
+    </p>
+
+    <!-- 5 -->
+    <h2 id="data-retention"><i class="bi bi-clock-history"></i> 5. Data Retention</h2>
+    <p>
+      Questions and associated metadata (submission time, delivery status, IP address) are retained
+      in our database for as long as they are operationally useful — typically the lifetime of the
+      sermon they relate to. Administrators may delete questions at any time from the admin panel.
+    </p>
+    <p>
+      IP addresses used for rate limiting are stored temporarily in cache memory and automatically
+      expire after <strong>1 hour</strong>. They are not written to permanent storage independently.
+    </p>
+
+    <!-- 6 -->
+    <h2 id="cookies"><i class="bi bi-browser-chrome"></i> 6. Cookies &amp; Local Storage</h2>
+    <p>This platform uses only essential, functional cookies:</p>
+    <ul>
+      <li><strong>Session cookie</strong> — used only if you are an authenticated administrator. Anonymous question submitters do not receive a persistent session cookie.</li>
+      <li><strong>CSRF token</strong> — a security cookie used to protect form submissions from cross-site request forgery. This is a security requirement and contains no personal data.</li>
+    </ul>
+    <p>We do not use advertising cookies, tracking pixels, or analytics cookies.</p>
+
+    <!-- 7 -->
+    <h2 id="third-parties"><i class="bi bi-box-arrow-up-right"></i> 7. Third-Party Services</h2>
+    <p>This platform integrates with the following third-party services:</p>
+    <ul>
+      <li>
+        <strong>Meta (WhatsApp Business API)</strong> — used to deliver questions to speakers.
+        <a href="https://www.whatsapp.com/legal/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+      </li>
+      <li>
+        <strong>Render.com or Namecheap</strong> — web hosting provider where the application runs.
+        Your data is stored on servers operated by our hosting provider.
+      </li>
+      <li>
+        <strong>Google Fonts &amp; Bootstrap CDN</strong> — used for typography and UI styling. These
+        services may log your IP address as part of standard CDN operation.
+      </li>
+    </ul>
+    <p>We do not sell, rent, or share your information with any third party for commercial purposes.</p>
+
+    <!-- 8 -->
+    <h2 id="your-rights"><i class="bi bi-person-check"></i> 8. Your Rights</h2>
+    <p>You have the right to:</p>
+    <ul>
+      <li><strong>Know</strong> what information we hold — contact us and we will describe what is stored.</li>
+      <li><strong>Delete</strong> a question you submitted — contact us with the approximate time and sermon, and we will remove it.</li>
+      <li><strong>Object</strong> to processing — you may choose not to use this platform at any time.</li>
+    </ul>
+    <p>
+      Because submissions are anonymous, we cannot verify ownership of a specific question without
+      additional context (e.g. exact text, time submitted, sermon). We will make reasonable efforts
+      to honour deletion requests.
+    </p>
+
+    <!-- 9 -->
+    <h2 id="children"><i class="bi bi-people"></i> 9. Children's Privacy</h2>
+    <p>
+      This service is open to all members of {{ CHURCH_NAME }}, including young people. We do not
+      knowingly collect any additional personal data from children. Because no account or personal
+      information is required to submit a question, the platform is safe for use by all ages.
+      Parents or guardians with concerns may contact us using the details below.
+    </p>
+
+    <!-- 10 -->
+    <h2 id="changes"><i class="bi bi-pencil-square"></i> 10. Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time to reflect changes in our practices or
+      applicable law. When we do, we will update the "Last updated" date at the top of this page.
+      We encourage you to review this page periodically. Continued use of the platform after changes
+      constitutes acceptance of the updated policy.
+    </p>
+
+    <!-- 11 -->
+    <h2 id="contact"><i class="bi bi-envelope"></i> 11. Contact Us</h2>
+    <p>
+      If you have questions, concerns, or requests regarding this Privacy Policy or the handling
+      of your information, please contact {{ CHURCH_NAME }} directly through your church's
+      official communication channels or speak with a church administrator.
+    </p>
+
+    <div class="contact-card">
+      <h5>Questions About Your Privacy?</h5>
+      <p>Speak to a {{ CHURCH_NAME }} administrator or raise your concern during any church service. We are committed to addressing privacy concerns promptly and transparently.</p>
+    </div>
+
+    <p class="mt-4 text-muted" style="font-size:.8rem">
+      Also see: <a href="{% url 'terms_of_service' %}">Terms of Service</a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}
