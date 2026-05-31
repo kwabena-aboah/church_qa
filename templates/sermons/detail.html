@@ -81,7 +81,7 @@
       {% if sermon.description %}
       <div class="card p-3 mb-3">
         <h6 class="df mb-2" style="color:var(--primary)">About This Sermon</h6>
-        <p class="mb-0 text-muted" style="font-size:.9rem;line-height:1.7">{{ sermon.description }}</p>
+        <p class="mb-0 text-muted" style="font-size:.9rem;line-height:1.7">{{ sermon.description|safe }}</p>
       </div>
       {% endif %}
       <!-- Speaker Info Card -->
@@ -97,7 +97,7 @@
             <div class="text-muted" style="font-size:.78rem">Questions go directly to this speaker</div>
           </div>
         </div>
-        {% if sermon.speaker.bio %}<p class="mb-0 text-muted" style="font-size:.83rem">{{ sermon.speaker.bio }}</p>{% endif %}
+        {% if sermon.speaker.bio %}<p class="mb-0 text-muted" style="font-size:.83rem">{{ sermon.speaker.bio|safe }}</p>{% endif %}
       </div>
     </div>
 

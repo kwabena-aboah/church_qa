@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from tinymce.models import HTMLField
 import uuid
 
 
@@ -9,7 +10,7 @@ class Speaker(models.Model):
         max_length=20,
         help_text="International format e.g. 233241234567 (no + or spaces)"
     )
-    bio = models.TextField(blank=True)
+    bio = HTMLField(blank=True)
     photo = models.ImageField(upload_to='speakers/', blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -42,7 +43,7 @@ class Sermon(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=300)
-    description = models.TextField(blank=True)
+    description = HTMLField(blank=True)
     speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE, related_name='sermons')
     category = models.ForeignKey(SermonCategory, on_delete=models.SET_NULL, null=True, blank=True)
     media_type = models.CharField(max_length=10, choices=MEDIA_TYPES, default='video')

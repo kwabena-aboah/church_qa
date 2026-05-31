@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'widget_tweaks',
+    'tinymce',
     'sermons',
     'dashboard',
     'pages',
@@ -58,6 +59,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'church_qa.wsgi.application'
+
+DJANGO_SETTINGS_MODULE='church_qa.settings'
 
 # Database
 DATABASE_URL = os.getenv('DATABASE_URL')
