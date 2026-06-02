@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.conf import settings
 from django.views import View
 from django.db.models import Q
 from django.core.cache import cache
@@ -15,6 +16,8 @@ from .whatsapp import verify_webhook
 logger = logging.getLogger(__name__)
 
 RATE_LIMIT_PER_HOUR = 5  # questions per IP per hour
+
+VERIFY_TOKEN = settings.WHATSAPP_VERIFY_TOKEN
 
 
 def get_client_ip(request):
@@ -137,22 +140,36 @@ def submit_question(request, pk):
     })
 
 
-# WhatsApp Webhook
 @csrf_exempt
 def whatsapp_webhook(request):
-    if request.method == 'GET':
-        mode = request.GET.get('hub.mode')
-        token = request.GET.get('hub.verify_token')
-        challenge = request.GET.get('hub.challenge')
-        if mode == 'subscribe':
-            result = verify_webhook(token, challenge)
-            if result:
-                return HttpResponse(result)
-        return HttpResponse('Forbidden', status=403)
 
-    if request.method == 'POST':
-        # Handle incoming messages (optional: log speaker replies)
-        logger.info(f"WA Webhook received: {request.body[:200]}")
-        return JsonResponse({'status': 'ok'})
+    # =========================
+    # FACEBOOK / WHATSAPP VERIFICATION (GET)
+    # =========================
+    if request.method == "GET":
+        mode = request.GET.get("hub.mode")
+        token = request.GET.get("hub.verify_token")
+        challenge = request.GET.get("hub.challenge")
 
-    return HttpResponse('Method not allowed', status=405)
+        if mode == "subscribe" and token == VERIFY_TOKEN:
+            return HttpResponse(challenge)  # MUST return raw text
+
+        return HttpResponse("Forbidden", status=403)
+
+    # =========================
+    # WEBHOOK EVENTS (POST)
+    # =========================
+    if request.method == "POST":
+        try:
+            data = request.body.decode("utf-8")
+            logger.info(f"WhatsApp webhook received: {data[:500]}")
+
+            # TODO: parse JSON and process messages here
+
+            return JsonResponse({"status": "ok"})
+
+        except Exception as e:
+            logger.error(f"Webhook error: {str(e)}")
+            return JsonResponse({"error": "bad request"}, status=400)
+
+    return HttpResponse("Method not allowed", status=405)
