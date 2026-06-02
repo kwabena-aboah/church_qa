@@ -144,32 +144,25 @@ def submit_question(request, pk):
 def whatsapp_webhook(request):
 
     # =========================
-    # FACEBOOK / WHATSAPP VERIFICATION (GET)
+    # META VERIFICATION (GET)
     # =========================
     if request.method == "GET":
         mode = request.GET.get("hub.mode")
         token = request.GET.get("hub.verify_token")
         challenge = request.GET.get("hub.challenge")
 
+        logger.info(f"Webhook verify attempt: mode={mode}, token={token}")
+
         if mode == "subscribe" and token == VERIFY_TOKEN:
-            return HttpResponse(challenge)  # MUST return raw text
+            return HttpResponse(challenge, content_type="text/plain")
 
         return HttpResponse("Forbidden", status=403)
 
     # =========================
-    # WEBHOOK EVENTS (POST)
+    # EVENTS (POST)
     # =========================
     if request.method == "POST":
-        try:
-            data = request.body.decode("utf-8")
-            logger.info(f"WhatsApp webhook received: {data[:500]}")
-
-            # TODO: parse JSON and process messages here
-
-            return JsonResponse({"status": "ok"})
-
-        except Exception as e:
-            logger.error(f"Webhook error: {str(e)}")
-            return JsonResponse({"error": "bad request"}, status=400)
+        logger.info(f"Webhook received: {request.body[:300]}")
+        return HttpResponse("EVENT_RECEIVED", status=200)
 
     return HttpResponse("Method not allowed", status=405)
