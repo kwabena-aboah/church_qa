@@ -78,6 +78,6 @@ services:
         sync: false
 
   # Redis
-  - type: redis
-    name: church-qa-redis
-    plan: free
+  # - type: redis
+  #   name: church-qa-redis
+  #   plan: free
