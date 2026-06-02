@@ -21,15 +21,8 @@ services:
       - key: ALLOWED_HOSTS
         value: "church-qa-web.onrender.com"
 
-      # Set manually in Render Dashboard
       - key: DATABASE_URL
         sync: false
-
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: church-qa-redis
-          property: connectionString
 
       - key: WHATSAPP_API_TOKEN
         sync: false
@@ -45,41 +38,3 @@ services:
 
       - key: CHURCH_TAGLINE
         value: "Ask questions about our sermons"
-
-  # Celery Worker
-  - type: worker
-    name: church-qa-worker
-    env: python
-
-    buildCommand: pip install -r requirements.txt
-
-    startCommand: celery -A church_qa worker --loglevel=info --concurrency=2
-
-    envVars:
-      - key: DATABASE_URL
-        sync: false
-
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: church-qa-redis
-          property: connectionString
-
-      - key: SECRET_KEY
-        fromService:
-          type: web
-          name: church-qa-web
-          envVarKey: SECRET_KEY
-
-      - key: WHATSAPP_API_TOKEN
-        sync: false
-
-      - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
-
-  # Redis
-    - key: REDIS_URL
-      sync: false
-  # - type: redis
-  #   name: church-qa-redis
-  #   plan: free
