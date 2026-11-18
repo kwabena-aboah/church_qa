@@ -12,5 +12,4 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
     path('', include('sermons.urls')),
     path('', include('pages.urls')),
-    path('', include('sermons.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -151,7 +151,7 @@ def whatsapp_webhook(request):
         token = request.GET.get("hub.verify_token")
         challenge = request.GET.get("hub.challenge")
 
-        logger.info(f"Webhook verify attempt: mode={mode}, token={token}")
+        logger.info("Webhook verify attempt: mode=%s", mode)
 
         if mode == "subscribe" and token == VERIFY_TOKEN:
             return HttpResponse(challenge, content_type="text/plain")
@@ -162,7 +162,7 @@ def whatsapp_webhook(request):
     # EVENTS (POST)
     # =========================
     if request.method == "POST":
-        logger.info(f"Webhook received: {request.body[:300]}")
+        logger.info("Webhook received (%d bytes)", len(request.body))
         return HttpResponse("EVENT_RECEIVED", status=200)
 
     return HttpResponse("Method not allowed", status=405)

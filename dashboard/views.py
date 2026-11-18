@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q, Avg
 from django.db.models.functions import TruncDay, TruncWeek, TruncMonth
@@ -164,7 +164,7 @@ def retry_question(request, pk):
     from sermons.models import Question
     from sermons.whatsapp import send_question_to_speaker
     if request.method == 'POST':
-        q = Question.objects.get(pk=pk)
+        q = get_object_or_404(Question, pk=pk)
         send_question_to_speaker(q)
         return JsonResponse({'success': True, 'status': q.status})
     return JsonResponse({'error': 'POST required'}, status=400)

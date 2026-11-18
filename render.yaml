@@ -19,7 +19,19 @@ services:
         value: "False"
 
       - key: ALLOWED_HOSTS
-        value: "church-qa-web.onrender.com"
+        sync: false
+
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+
+      - key: CLOUDFLARE_ZONE_ID
+        sync: false
+
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
 
       - key: DATABASE_URL
         sync: false
