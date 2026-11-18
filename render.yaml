@@ -2,7 +2,8 @@ services:
   # Django Web Service
   - type: web
     name: church-qa-web
-    env: python
+    runtime: python
+    region: oregon
 
     buildCommand: |
       pip install -r requirements.txt
@@ -34,7 +35,9 @@ services:
         sync: false
 
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: church-qa-db
+          property: connectionString
 
       - key: WHATSAPP_API_TOKEN
         sync: false
@@ -50,3 +53,11 @@ services:
 
       - key: CHURCH_TAGLINE
         value: "Ask questions about our sermons"
+
+databases:
+  - name: church-qa-db
+    databaseName: church_qa
+    user: church_qa
+    region: oregon
+    plan: 0.1c-256mb
+    ipAllowList: []

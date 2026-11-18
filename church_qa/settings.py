@@ -9,12 +9,14 @@ def env_bool(name, default=False):
     return os.getenv(name, str(default)).strip().lower() in {'1', 'true', 'yes', 'on'}
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEBUG = env_bool('DEBUG', True)
-SECRET_KEY = os.getenv('SECRET_KEY', '#sto)-gjrh$u)bx^i))lum)&l%8kl^#qhf99aa$jc$tb8e^di1')
+IS_VERCEL = env_bool('VERCEL', False)
+IS_RENDER = env_bool('RENDER', False)
+DEBUG = env_bool('DEBUG', not (IS_VERCEL or IS_RENDER))
+SECRET_KEY = os.getenv('SECRET_KEY', '')
 if not SECRET_KEY:
     if not DEBUG:
         raise ImproperlyConfigured('Set SECRET_KEY to a strong random value in production.')
-    SECRET_KEY = '#sto)-gjrh$u)bx^i))lum)&l%8kl^#qhf99aa$jc$tb8e^di1'
+    SECRET_KEY = 'django-insecure-local-development-only'
 if not DEBUG and (
     SECRET_KEY.startswith('django-insecure-')
     or len(SECRET_KEY) < 50
@@ -23,6 +25,16 @@ if not DEBUG and (
     raise ImproperlyConfigured('Production SECRET_KEY must be long and randomly generated.')
 
 ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
+for host_variable in (
+    'VERCEL_URL',
+    'VERCEL_BRANCH_URL',
+    'VERCEL_PROJECT_PRODUCTION_URL',
+    'RENDER_EXTERNAL_HOSTNAME',
+):
+    vercel_host = os.getenv(host_variable, '').strip()
+    if vercel_host:
+        ALLOWED_HOSTS.append(vercel_host)
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -81,6 +93,9 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
     import dj_database_url
     DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+elif IS_VERCEL or IS_RENDER:
+    platform = 'Vercel' if IS_VERCEL else 'Render'
+    raise ImproperlyConfigured(f'Set DATABASE_URL to a persistent PostgreSQL database for {platform}.')
 else:
     DATABASES = {
         'default': {
@@ -126,6 +141,16 @@ REST_FRAMEWORK = {
 # CORS
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:8000').split(',') if origin.strip()]
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if origin.strip()]
+for host_variable in (
+    'VERCEL_URL',
+    'VERCEL_BRANCH_URL',
+    'VERCEL_PROJECT_PRODUCTION_URL',
+    'RENDER_EXTERNAL_HOSTNAME',
+):
+    vercel_host = os.getenv(host_variable, '').strip()
+    if vercel_host:
+        CSRF_TRUSTED_ORIGINS.append(f'https://{vercel_host}')
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(CSRF_TRUSTED_ORIGINS))
 
 # Cloudflare API (optional; keep credentials in deployment environment variables)
 CLOUDFLARE_API_TOKEN = os.getenv('CLOUDFLARE_API_TOKEN', '')
